@@ -120,7 +120,7 @@
                             "runAfter": {},
                             "type": "ApiConnection",
                             "inputs": {
-                                "body": "Usage\n| where TimeGenerated > startofday(ago(10d))\n| where IsBillable == true\n| summarize ['Total ingested logs (GB)'] = sum(Quantity) / 1000 by bin(TimeGenerated, 1d)",
+                                "body": "Usage\n| where TimeGenerated > startofday(ago(30d))\n| where IsBillable == true\n| summarize ['Total ingested logs (GB)'] = sum(Quantity) / 1000 by bin(TimeGenerated, 1d)",
                                 "host": {
                                     "connection": {
                                         "name": "@parameters('$connections')['azuremonitorlogs']['connectionId']"
