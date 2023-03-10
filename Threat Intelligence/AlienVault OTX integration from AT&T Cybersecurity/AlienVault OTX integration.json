@@ -661,7 +661,7 @@
                                     {
                                         "name": "Tennant",
                                         "type": "string",
-                                        "value": "ADD YOUR OWN VALUE"
+                                        "value": "[parameters('TenantID')]"
                                     }
                                 ]
                             }
