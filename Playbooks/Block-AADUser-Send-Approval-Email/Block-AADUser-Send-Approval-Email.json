@@ -14,9 +14,9 @@
         }
     },
     "variables": {
-        "AzureADConnectionName": "[concat('azuread-', parameters('PlaybookName'))]",
-        "MicrosoftSentinelConnectionName": "[concat('microsoftsentinel-', parameters('PlaybookName'))]",
-        "Office365ConnectionName": "[concat('office365-', parameters('PlaybookName'))]"
+        "AzureADConnectionName": "[concat('azuread_', parameters('PlaybookName'))]",
+        "MicrosoftSentinelConnectionName": "[concat('microsoftsentinel_', parameters('PlaybookName'))]",
+        "Office365ConnectionName": "[concat('office365_', parameters('PlaybookName'))]"
     },
     "resources": [
         {
