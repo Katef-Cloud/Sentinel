@@ -1,0 +1,64 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/2ea1308d-7de4-4153-8ea2-e32672074dec')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/2ea1308d-7de4-4153-8ea2-e32672074dec')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "NRT",
+            "apiVersion": "2022-09-01-preview",
+            "properties": {
+                "displayName": "(Test) Account failed to login into Azure portal more than 3 times within 1 minute",
+                "description": "(Test) Account failed to login into Azure portal more than 3 times within 1 minute",
+                "severity": "Medium",
+                "enabled": true,
+                "query": "SigninLogs\r\n| where AppDisplayName has \"Azure Portal\"\r\n| where ResultType !in (\"0\", \"50125\", \"50140\", \"70043\", \"70044\")\r\n| summarize FailureCount=count() by UserPrincipalName\r\n| where FailureCount >= 3\r\n",
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [
+                    "InitialAccess"
+                ],
+                "techniques": [
+                    "T1190"
+                ],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "FullName",
+                                "columnName": "UserPrincipalName"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": null
+            }
+        }
+    ]
+}
