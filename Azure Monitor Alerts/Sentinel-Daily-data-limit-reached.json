@@ -1,0 +1,108 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "LogAnalyticsWorkspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "the Name of existing Log Analytics Workspace"
+            }
+        },
+        "AlertRuleName": {
+            "defaultValue": "Sentinel | Daily data limit reached",
+            "type": "string",
+            "metadata": {
+                "description": "Name of Alert Rule that will be created"
+            }
+        },
+        "ActionGroupName": {
+            "defaultValue": "SecurityAdmins",
+            "type": "string",
+            "metadata": {
+                "description": "Name of Action Group that will be created"
+            }
+        },
+        "ActionGroupRecipientEmail": {
+            "type": "string",
+            "metadata": {
+                "description": "Mention Only one Email Addresses. You can update the Action Group after Creation"
+            }
+        }
+    },
+    "variables": {
+        "WorkspaceID": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('LogAnalyticsWorkspaceName') )]",
+    },
+    "resources": [
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2023-01-01",
+            "name": "[parameters('ActionGroupName')]",
+            "location": "Global",
+            "properties": {
+                "groupShortName": "SecAdmins",
+                "enabled": true,
+                "emailReceivers": [
+                    {
+                        "name": "[concat(parameters('ActionGroupRecipientEmail'), '_-EmailAction-' )]",
+                        "emailAddress": "[parameters('ActionGroupRecipientEmail')]",
+                        "useCommonAlertSchema": false
+                    }
+                ],
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "eventHubReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [],
+                "azureFunctionReceivers": [],
+                "armRoleReceivers": []
+            }
+        },
+        {
+            "type": "microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[parameters('AlertRuleName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups', parameters('ActionGroupName'))]"
+            ],
+            "properties": {
+                "displayName": "[parameters('AlertRuleName')]",
+                "severity": 2,
+                "enabled": true,
+                "evaluationFrequency": "PT5M",
+                "scopes": [
+                    "[variables('WorkspaceID')]"
+                ],
+                "targetResourceTypes": [
+                    "microsoft.operationalinsights/workspaces"
+                ],
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "query": "_LogOperation | where Category =~ \"Ingestion\" | where Detail contains \"OverQuota\"\n",
+                            "timeAggregation": "Count",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "threshold": 0,
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": 1,
+                                "minFailingPeriodsToAlert": 1
+                            }
+                        }
+                    ]
+                },
+                "autoMitigate": false,
+                "actions": {
+                    "actionGroups": [
+                        "[resourceId('microsoft.insights/actionGroups', parameters('ActionGroupName'))]"
+                    ],
+                    "customProperties": {}
+                }
+            }
+        }
+    ]
+}
