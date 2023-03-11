@@ -30,7 +30,7 @@
         }
     },
     "variables": {
-        "WorkspaceID": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('LogAnalyticsWorkspaceName') )]",
+        "WorkspaceID": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('LogAnalyticsWorkspaceName') )]"
     },
     "resources": [
         {
